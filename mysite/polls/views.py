@@ -3,10 +3,11 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.template import loader
 from .models import Question, Choice
+from django.utils import timezone
 
 
 def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    latest_question_list = Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
     template = loader.get_template('polls/index.html')
     context = {'latest_question_list': latest_question_list}
     return HttpResponse(template.render(context, request))
@@ -14,7 +15,7 @@ def index(request):
 
 def detail(request, question_id):
     try:
-        question = Question.objects.get(pk=question_id)
+        question = Question.objects.filter(pub_date__lte=timezone.now()).get(pk=question_id)
         context = {'question': question}
     except Question.DoesNotExist:
         raise Http404("Question does not exist")
@@ -23,7 +24,7 @@ def detail(request, question_id):
 
 
 def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
+    question = get_object_or_404(Question, pk=question_id).filter(pub_date__lte=timezone.now())
     return render(request, 'polls/results.html', {'question': question})
 
 

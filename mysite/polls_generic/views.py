@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic
+from django.utils import timezone
 from polls.models import Question, Choice   # sharing the same model and data from polls
 
 # We’re using two generic views here: ListView and DetailView. Respectively, those two views abstract the concepts of
@@ -18,8 +19,11 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_question_list'
 
     def get_queryset(self):
-        """ Returns the last 5 published questions """
-        return Question.objects.order_by('-pub_date')[:5]
+        """
+        Returns the last 5 published questions. Do not include those set
+        to be published in future
+        """
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
 
 
 # By default, the DetailView generic view uses a template called <app name>/<model name>_detail.html. In our case, it
@@ -30,6 +34,12 @@ class IndexView(generic.ListView):
 class DetailView(generic.DetailView):
     model = Question
     template_name = 'polls_generic/detail.html'
+
+    def get_queryset(self):
+        """
+        Excludes any questions that are not published yet
+        """
+        return Question.objects.filter(pub_date__lte=timezone.now())
 
 
 class ResultView(generic.DetailView):
