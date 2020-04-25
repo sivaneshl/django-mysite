@@ -37,7 +37,7 @@ def vote(request, question_id):
     except (KeyError, Choice.DoesNotExist):
         # request.POST['choice'] will raise KeyError if choice wasn’t provided in POST data. The code checks for
         # KeyError and re-displays the question form with an error message if choice isn’t given.
-        return render(request, 'polls.detail.html',
+        return render(request, 'polls/detail.html',
                       {'question': question, 'error_message': "You didn't select a choice"})
     else:
         selected_choice.votes += 1
