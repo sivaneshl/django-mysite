@@ -24,7 +24,7 @@ def detail(request, question_id):
 
 
 def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id).filter(pub_date__lte=timezone.now())
+    question = get_object_or_404(Question.objects.filter(pub_date__lte=timezone.now()), pk=question_id)
     return render(request, 'polls/results.html', {'question': question})
 
 
